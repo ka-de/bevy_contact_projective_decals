@@ -13,5 +13,5 @@ bevy-inspector-egui = { git = "https://github.com/ka-de/bevy-inspector-egui" }
 bevy_panorbit_camera = { git = "https://github.com/ka-de/bevy_panorbit_camera", features = [
   "bevy_egui",
 ] }
-bevy_screen_diagnostics = "0.5.0"
+bevy_screen_diagnostics = { git = "https://github.com/ka-de/bevy_screen_diagnostics" }
 rand = "0.8.5"
