@@ -9,7 +9,9 @@ edition = "2021"
 bevy = "0.13.0"
 
 [dev-dependencies]
-bevy-inspector-egui = "0.23.2"
-bevy_panorbit_camera = { version = "0.14.0", features = ["bevy_egui"] }
+bevy-inspector-egui = { git = "https://github.com/ka-de/bevy-inspector-egui" }
+bevy_panorbit_camera = { git = "https://github.com/ka-de/bevy_panorbit_camera", features = [
+  "bevy_egui",
+] }
 bevy_screen_diagnostics = "0.5.0"
 rand = "0.8.5"
