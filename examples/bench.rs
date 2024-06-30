@@ -1,18 +1,21 @@
 use bevy_inspector_egui::bevy_egui::EguiPlugin;
-use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
+use bevy_panorbit_camera::{ PanOrbitCamera, PanOrbitCameraPlugin };
 use bevy_screen_diagnostics::{
-    Aggregate, ScreenDiagnostics, ScreenDiagnosticsPlugin, ScreenFrameDiagnosticsPlugin,
+    Aggregate,
+    ScreenDiagnostics,
+    ScreenDiagnosticsPlugin,
+    ScreenFrameDiagnosticsPlugin,
 };
 use std::time::Duration;
 
 use bevy::{
     core_pipeline::prepass::DepthPrepass,
-    diagnostic::{Diagnostic, DiagnosticPath, Diagnostics, RegisterDiagnostic},
+    diagnostic::{ Diagnostic, DiagnosticPath, Diagnostics, RegisterDiagnostic },
     pbr::ExtendedMaterial,
     prelude::*,
 };
-use bevy_contact_projective_decals::{decal_mesh_quad, DecalBundle, DecalMaterial, DecalPlugin};
-use rand::{seq::SliceRandom, thread_rng, Rng};
+use bevy_contact_projective_decals::{ decal_mesh_quad, DecalBundle, DecalMaterial, DecalPlugin };
+use rand::{ thread_rng, Rng };
 fn main() {
     App::new()
         .add_plugins((
@@ -41,7 +44,7 @@ fn spawn_decals(
     input: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
     mut spawn: Local<bool>,
-    my_handles: Res<DecalHandles>,
+    my_handles: Res<DecalHandles>
 ) {
     if local_timer.duration() == Duration::ZERO {
         local_timer.set_duration(Duration::from_secs_f32(0.01));
@@ -74,7 +77,7 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut decal_materials: ResMut<Assets<ExtendedMaterial<StandardMaterial, DecalMaterial>>>,
-    asset_server: Res<AssetServer>,
+    asset_server: Res<AssetServer>
 ) {
     let decal_material = decal_materials.add(ExtendedMaterial::<StandardMaterial, DecalMaterial> {
         base: StandardMaterial {
@@ -89,15 +92,17 @@ fn setup(
     });
     commands.insert_resource(DecalHandles {
         mat_uv: decal_material,
-        mesh: meshes.add(decal_mesh_quad(Vec3::Y)),
+        mesh: meshes.add(decal_mesh_quad().rotated_by(Quat::from_rotation_arc(Vec3::Z, Vec3::Y))),
     });
-    commands.spawn((TextBundle::from_section(
-        "Press space to start / stop.\nDrag mouse to pan, scroll to zoom",
-        TextStyle {
-            font_size: 25.,
-            ..default()
-        },
-    ),));
+    commands.spawn((
+        TextBundle::from_section(
+            "Press space to start / stop.\nDrag mouse to pan, scroll to zoom",
+            TextStyle {
+                font_size: 25.0,
+                ..default()
+            }
+        ),
+    ));
     commands.spawn(PbrBundle {
         mesh: meshes.add(Rectangle::new(10.0, 10.0)),
         material: materials.add(Color::WHITE),
@@ -112,14 +117,15 @@ fn setup(
             let rotation_vec: Vec3 = rotation_axis.into();
             let rotation: u32 = thread_rng().gen_range(0..360);
             let transform = Transform::from_xyz(
-                (-num_obs + 1) as f32 / 2.0 + i as f32,
+                ((-num_obs + 1) as f32) / 2.0 + (i as f32),
                 -0.2,
-                (-num_obs + 1) as f32 / 2.0 + j as f32,
-            )
-            .with_rotation(Quat::from_axis_angle(
-                rotation_vec.normalize_or_zero(),
-                (rotation as f32).to_radians(),
-            ));
+                ((-num_obs + 1) as f32) / 2.0 + (j as f32)
+            ).with_rotation(
+                Quat::from_axis_angle(
+                    rotation_vec.normalize_or_zero(),
+                    (rotation as f32).to_radians()
+                )
+            );
             commands.spawn(PbrBundle {
                 mesh: meshes.add(Cuboid::new(0.6, 0.6, 0.6)),
                 material: materials.add(Color::WHITE),
@@ -160,7 +166,7 @@ fn setup_diagnostic(mut onscreen: ResMut<ScreenDiagnostics>) {
 
 fn thing_count(
     mut diagnostics: Diagnostics,
-    parts: Query<&Handle<ExtendedMaterial<StandardMaterial, DecalMaterial>>>,
+    parts: Query<&Handle<ExtendedMaterial<StandardMaterial, DecalMaterial>>>
 ) {
     diagnostics.add_measurement(&DECAL_COUNT, || parts.iter().len() as f64);
 }

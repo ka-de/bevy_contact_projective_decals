@@ -2,14 +2,20 @@ use bevy::{
     asset::embedded_asset,
     math::primitives::Rectangle,
     pbr::{
-        ExtendedMaterial, MaterialExtension, MaterialExtensionKey, MaterialExtensionPipeline,
+        ExtendedMaterial,
+        MaterialExtension,
+        MaterialExtensionKey,
+        MaterialExtensionPipeline,
         NotShadowCaster,
     },
     prelude::*,
     render::{
-        mesh::MeshVertexBufferLayout,
+        mesh::MeshVertexBufferLayoutRef,
         render_resource::{
-            AsBindGroup, CompareFunction, RenderPipelineDescriptor, ShaderRef,
+            AsBindGroup,
+            CompareFunction,
+            RenderPipelineDescriptor,
+            ShaderRef,
             SpecializedMeshPipelineError,
         },
     },
@@ -19,21 +25,15 @@ pub struct DecalPlugin;
 impl Plugin for DecalPlugin {
     fn build(&self, app: &mut App) {
         embedded_asset!(app, "decal.wgsl");
-        app.add_plugins(
-            MaterialPlugin::<ExtendedMaterial<StandardMaterial, DecalMaterial>> {
-                prepass_enabled: false,
-                ..default()
-            },
-        );
+        app.add_plugins(MaterialPlugin::<ExtendedMaterial<StandardMaterial, DecalMaterial>> {
+            prepass_enabled: false,
+            ..default()
+        });
     }
 }
 /// A quad with specified size, rotated so that normal is facing Vec3::Y and generated tangents.
-pub fn decal_mesh_quad(normal: Vec3) -> Mesh {
-    Rectangle::from_size(Vec2::ONE)
-        .mesh()
-        .rotated_by(Quat::from_rotation_arc(Vec3::Z, normal))
-        .with_generated_tangents()
-        .unwrap()
+pub fn decal_mesh_quad() -> Mesh {
+    Rectangle::from_size(Vec2::ONE).mesh().into()
 }
 /// Bundle containing what you need for a bundle, use [decal_mesh_quad] to generate the mesh.
 #[derive(Bundle, Default)]
@@ -57,8 +57,8 @@ impl MaterialExtension for DecalMaterial {
     fn specialize(
         _pipeline: &MaterialExtensionPipeline,
         descriptor: &mut RenderPipelineDescriptor,
-        _layout: &MeshVertexBufferLayout,
-        _key: MaterialExtensionKey<Self>,
+        _layout: &MeshVertexBufferLayoutRef,
+        _key: MaterialExtensionKey<Self>
     ) -> Result<(), SpecializedMeshPipelineError> {
         if let Some(label) = &mut descriptor.label {
             *label = format!("decal_{}", *label).into();
